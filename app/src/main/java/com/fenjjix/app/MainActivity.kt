@@ -19,7 +19,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -37,7 +36,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import java.net.URLEncoder
-import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -172,15 +170,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun crearPanel() {
-        val inflater = LayoutInflater.from(this)
         val panel = LinearLayout(this)
         panel.orientation = LinearLayout.VERTICAL
         panel.setBackgroundColor(Color.WHITE)
         panel.setPadding(30, 30, 30, 30)
+        panel.layoutParams = LinearLayout.LayoutParams(700, LinearLayout.LayoutParams.WRAP_CONTENT)
+
+        // Parámetros comunes para los hijos
+        val childParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        childParams.setMargins(10, 10, 10, 10)
 
         // Spinners
         spinnerOrigen = Spinner(this)
+        spinnerOrigen.minimumHeight = 80
+        spinnerOrigen.layoutParams = childParams
+
         spinnerDestino = Spinner(this)
+        spinnerDestino.minimumHeight = 80
+        spinnerDestino.layoutParams = childParams
 
         val adapterOrigen = ArrayAdapter(this, android.R.layout.simple_spinner_item, sourceLanguages)
         adapterOrigen.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -195,29 +205,44 @@ class MainActivity : AppCompatActivity() {
         tvOrigen = TextView(this)
         tvOrigen.text = ""
         tvOrigen.setTextColor(Color.BLACK)
+        tvOrigen.minimumHeight = 60
+        tvOrigen.setPadding(20, 20, 20, 20)
+        tvOrigen.setBackgroundColor(Color.parseColor("#EEEEEE"))
+        tvOrigen.layoutParams = childParams
 
         tvDestino = TextView(this)
         tvDestino.text = ""
         tvDestino.setTextColor(Color.BLACK)
+        tvDestino.minimumHeight = 60
+        tvDestino.setPadding(20, 20, 20, 20)
+        tvDestino.setBackgroundColor(Color.parseColor("#EEEEEE"))
+        tvDestino.layoutParams = childParams
 
         // EditText
         etTexto = EditText(this)
         etTexto.hint = "Pega aquí el texto"
+        etTexto.minimumHeight = 100
+        etTexto.setPadding(20, 20, 20, 20)
+        etTexto.layoutParams = childParams
 
         // Buttons
         btnTraducir = Button(this)
         btnTraducir.text = "Traducir"
+        btnTraducir.layoutParams = childParams
 
         btnVoz = Button(this)
         btnVoz.text = "Voz"
+        btnVoz.layoutParams = childParams
 
         btnCopiar = Button(this)
         btnCopiar.text = "Copiar"
+        btnCopiar.layoutParams = childParams
 
         btnCerrar = Button(this)
         btnCerrar.text = "Cerrar"
+        btnCerrar.layoutParams = childParams
 
-        // Add views to panel
+        // Añadir vistas al panel
         panel.addView(spinnerOrigen)
         panel.addView(spinnerDestino)
         panel.addView(tvOrigen)
@@ -229,7 +254,7 @@ class MainActivity : AppCompatActivity() {
         panel.addView(btnCerrar)
 
         val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
+            700,
             WindowManager.LayoutParams.WRAP_CONTENT,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else WindowManager.LayoutParams.TYPE_PHONE,
@@ -237,9 +262,14 @@ class MainActivity : AppCompatActivity() {
             PixelFormat.TRANSLUCENT
         )
         params.gravity = Gravity.CENTER
+        params.x = 0
+        params.y = 300
 
         windowManager.addView(panel, params)
         panelView = panel
+
+        // Ocultar la burbuja mientras el panel está visible
+        bubbleView?.visibility = View.GONE
 
         btnTraducir.setOnClickListener {
             val texto = etTexto.text.toString()
@@ -268,6 +298,8 @@ class MainActivity : AppCompatActivity() {
             windowManager.removeView(it)
             panelView = null
         }
+        // Volver a mostrar la burbuja al cerrar el panel
+        bubbleView?.visibility = View.VISIBLE
         detenerReconocimientoVoz()
     }
 
@@ -304,7 +336,6 @@ class MainActivity : AppCompatActivity() {
                 override fun onBufferReceived(buffer: ByteArray?) {}
                 override fun onEndOfSpeech() {}
                 override fun onError(error: Int) {
-                    // Reiniciar en caso de error
                     if (isListening) {
                         Handler(Looper.getMainLooper()).postDelayed({ iniciarReconocimientoVoz() }, 500)
                     }
