@@ -36,6 +36,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import java.net.URLEncoder
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
 
@@ -135,6 +136,8 @@ class MainActivity : AppCompatActivity() {
                 private var initialY = 0
                 private var initialTouchX = 0f
                 private var initialTouchY = 0f
+                private var startX = 0f
+                private var startY = 0f
 
                 override fun onTouch(v: View?, event: MotionEvent): Boolean {
                     when (event.action) {
@@ -143,6 +146,8 @@ class MainActivity : AppCompatActivity() {
                             initialY = params.y
                             initialTouchX = event.rawX
                             initialTouchY = event.rawY
+                            startX = event.rawX
+                            startY = event.rawY
                             return true
                         }
                         MotionEvent.ACTION_MOVE -> {
@@ -151,18 +156,22 @@ class MainActivity : AppCompatActivity() {
                             windowManager.updateViewLayout(imageView, params)
                             return true
                         }
+                        MotionEvent.ACTION_UP -> {
+                            val distance = abs(event.rawX - startX) + abs(event.rawY - startY)
+                            if (distance < 10) {
+                                if (panelView == null) {
+                                    crearPanel()
+                                } else {
+                                    removerPanel()
+                                }
+                            }
+                            // Si la distancia es mayor, se consideró arrastre; no hacemos nada extra.
+                            return true
+                        }
                     }
                     return false
                 }
             })
-
-            imageView.setOnClickListener {
-                if (panelView == null) {
-                    crearPanel()
-                } else {
-                    removerPanel()
-                }
-            }
 
             windowManager.addView(imageView, params)
             bubbleView = imageView
