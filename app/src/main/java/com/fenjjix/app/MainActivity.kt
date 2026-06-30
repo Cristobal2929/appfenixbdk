@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -166,7 +167,6 @@ class MainActivity : AppCompatActivity() {
                                     removerPanel()
                                 }
                             }
-                            // Si la distancia es mayor, se consideró arrastre; no hacemos nada extra.
                             return true
                         }
                     }
@@ -234,6 +234,13 @@ class MainActivity : AppCompatActivity() {
         etTexto.minimumHeight = 100
         etTexto.setPadding(20, 20, 20, 20)
         etTexto.layoutParams = childParams
+        etTexto.isFocusable = true
+        etTexto.isFocusableInTouchMode = true
+        etTexto.setOnClickListener {
+            etTexto.requestFocus()
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(etTexto, InputMethodManager.SHOW_IMPLICIT)
+        }
 
         // Botón Pegar (nuevo)
         btnPegar = Button(this)
@@ -245,6 +252,7 @@ class MainActivity : AppCompatActivity() {
             if (clipData != null && clipData.itemCount > 0) {
                 val texto = clipData.getItemAt(0).coerceToText(this).toString()
                 etTexto.setText(texto)
+                etTexto.setSelection(texto.length)
             }
         }
 
@@ -288,6 +296,7 @@ class MainActivity : AppCompatActivity() {
         params.gravity = Gravity.CENTER
         params.x = 0
         params.y = 300
+        params.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
 
         windowManager.addView(panel, params)
         panelView = panel
