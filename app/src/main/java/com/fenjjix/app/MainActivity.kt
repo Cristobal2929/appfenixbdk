@@ -230,6 +230,7 @@ class MainActivity : AppCompatActivity() {
 
         // EditText
         etTexto = EditText(this)
+        etTexto.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
         etTexto.hint = "Pega aquí el texto"
         etTexto.minimumHeight = 100
         etTexto.setPadding(20, 20, 20, 20)
@@ -290,7 +291,9 @@ class MainActivity : AppCompatActivity() {
             WindowManager.LayoutParams.WRAP_CONTENT,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else WindowManager.LayoutParams.TYPE_PHONE,
-            WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
+            WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                    WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
             PixelFormat.TRANSLUCENT
         )
         params.gravity = Gravity.CENTER
