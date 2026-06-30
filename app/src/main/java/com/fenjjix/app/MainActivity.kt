@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnVoz: Button
     private lateinit var btnCopiar: Button
     private lateinit var btnCerrar: Button
+    private lateinit var btnPegar: Button   // Nuevo botón
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -234,6 +235,19 @@ class MainActivity : AppCompatActivity() {
         etTexto.setPadding(20, 20, 20, 20)
         etTexto.layoutParams = childParams
 
+        // Botón Pegar (nuevo)
+        btnPegar = Button(this)
+        btnPegar.text = "Pegar"
+        btnPegar.layoutParams = childParams
+        btnPegar.setOnClickListener {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = clipboard.primaryClip
+            if (clipData != null && clipData.itemCount > 0) {
+                val texto = clipData.getItemAt(0).coerceToText(this).toString()
+                etTexto.setText(texto)
+            }
+        }
+
         // Buttons
         btnTraducir = Button(this)
         btnTraducir.text = "Traducir"
@@ -257,6 +271,7 @@ class MainActivity : AppCompatActivity() {
         panel.addView(tvOrigen)
         panel.addView(tvDestino)
         panel.addView(etTexto)
+        panel.addView(btnPegar)          // Añadido antes de Traducir
         panel.addView(btnTraducir)
         panel.addView(btnVoz)
         panel.addView(btnCopiar)
