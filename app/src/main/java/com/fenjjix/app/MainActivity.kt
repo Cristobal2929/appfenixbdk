@@ -1,5 +1,7 @@
 package com.fenjjix.app
 
+import android.widget.Toast
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -252,8 +254,11 @@ class MainActivity : AppCompatActivity() {
             val clipData = clipboard.primaryClip
             if (clipData != null && clipData.itemCount > 0) {
                 val texto = clipData.getItemAt(0).coerceToText(this).toString()
+                android.widget.Toast.makeText(this, "Leído: $texto", android.widget.Toast.LENGTH_LONG).show()
                 etTexto.setText(texto)
                 etTexto.setSelection(texto.length)
+            } else {
+                android.widget.Toast.makeText(this, "Portapapeles vacío o null", android.widget.Toast.LENGTH_LONG).show()
             }
         }
 
